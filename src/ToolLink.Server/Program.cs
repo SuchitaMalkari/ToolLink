@@ -45,7 +45,7 @@ try
     {
         lock (consoleLock)
         {
-            PrintDashboard(registry, server);
+            PrintDashboard(registry, server, thresholds);
         }
     }
 }
@@ -55,16 +55,19 @@ catch (OperationCanceledException)
 
 Console.WriteLine("Shutting down...");
 
-static void PrintDashboard(ToolRegistry registry, TelemetryServer server)
+static void PrintDashboard(ToolRegistry registry, TelemetryServer server, AlarmThresholds thresholds)
 {
     Console.WriteLine();
     Console.WriteLine($"--- {registry.Count} tools | {server.ActiveConnections} connected | " +
                       $"{server.MessagesProcessed} messages | {server.MessagesRejected} rejected ---");
     Console.WriteLine($"{"TOOL",-10}{"STATE",-10}{"TEMP",8}{"PRESSURE",10}{"LAST SEEN",12}");
 
+    var now = DateTimeOffset.UtcNow;
     foreach (var tool in registry.Snapshot())
     {
-        Console.WriteLine($"{tool.ToolId,-10}{tool.State,-10}{tool.Temperature,8:F1}{tool.Pressure,10:F2}" +
+        // A tool that has gone silent shows as LOST instead of its last reported state.
+        string state = now - tool.LastSeen > thresholds.HeartbeatTimeout ? "LOST" : tool.State.ToString();
+        Console.WriteLine($"{tool.ToolId,-10}{state,-10}{tool.Temperature,8:F1}{tool.Pressure,10:F2}" +
                           $"{tool.LastSeen.ToLocalTime(),12:HH:mm:ss}");
     }
 

@@ -13,7 +13,7 @@ ToolLink receives live status from many pieces of equipment (simulated "tools") 
 - Raises alarms for **out-of-range temperature or pressure** and **FAULT** states.
 - Detects tools that **stop reporting** with a heartbeat timeout, raising the alarm once per outage.
 - Rejects malformed messages with a clear reason **without dropping the connection**.
-- Prints a live status table every 5 seconds.
+- Prints a live status table every 5 seconds, showing silent tools as `LOST`.
 - **32 xUnit tests** cover the parser, alarm rules, concurrent updates, and end-to-end TCP behavior (10 simultaneous clients, bad input, disconnects, and heartbeat timeouts using a fake clock). GitHub Actions runs them on every push.
 
 ## Architecture

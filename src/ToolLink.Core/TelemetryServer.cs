@@ -92,7 +92,7 @@ public sealed class TelemetryServer : IAsyncDisposable
             Task clientTask = HandleClientAsync(client, ct);
             _clientTasks[clientId] = clientTask;
             _ = clientTask.ContinueWith(
-                completed => _clientTasks.TryRemove(clientId, out _),
+                completed => { _clientTasks.TryRemove(clientId, out _); },
                 CancellationToken.None,
                 TaskContinuationOptions.ExecuteSynchronously,
                 TaskScheduler.Default);
